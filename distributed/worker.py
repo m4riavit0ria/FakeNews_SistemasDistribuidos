@@ -40,7 +40,6 @@ def processar_tarefa(tarefa):
         linha_inicio=tarefa["linha_inicio"],
         linha_fim=tarefa["linha_fim"],
         total_linhas=tarefa["total_linhas"],
-        limiar_convencimento=tarefa["limiar_convencimento"]
     )
 
     return {

@@ -101,7 +101,6 @@ def distribuir_tarefas(
     workers,
     grade,
     blocos,
-    limiar_convencimento
 ):
     total_linhas = len(grade)
 
@@ -113,7 +112,6 @@ def distribuir_tarefas(
             "linha_inicio": inicio,
             "linha_fim": fim,
             "total_linhas": total_linhas,
-            "limiar_convencimento": limiar_convencimento
         }
 
         enviar_mensagem(worker, tarefa)
@@ -151,7 +149,7 @@ def receber_resultados(workers, blocos):
     return nova_grade
 
 
-def executar_simulacao(grade, workers, quantidade_geracoes, limiar_convencimento):
+def executar_simulacao(grade, workers, quantidade_geracoes):
     quantidade_workers = len(workers)
     total_linhas = len(grade)
     blocos = dividir_linhas(total_linhas, quantidade_workers)
@@ -159,7 +157,7 @@ def executar_simulacao(grade, workers, quantidade_geracoes, limiar_convencimento
     for geracao in range(quantidade_geracoes):
         print(f"\n--- Geração {geracao + 1} ---")
 
-        distribuir_tarefas(workers, grade, blocos, limiar_convencimento)
+        distribuir_tarefas(workers, grade, blocos)
         grade = receber_resultados(workers, blocos)
 
         print(f"Geração {geracao + 1} concluída!")
@@ -192,7 +190,6 @@ def main():
     LINHAS = 1000
     COLUNAS = 1000
     GERACOES = 50
-    LIMIAR_CONVENCIMENTO = 3
     REPETICOES = 5
 
     tempos = []
@@ -215,7 +212,7 @@ def main():
             inicio = time.perf_counter()
 
             resultado = executar_simulacao(
-                grade, workers, GERACOES, LIMIAR_CONVENCIMENTO
+                grade, workers, GERACOES
             )
 
             fim = time.perf_counter()

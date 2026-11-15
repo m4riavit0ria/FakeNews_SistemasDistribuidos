@@ -1,9 +1,10 @@
+import random
 import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from comum import criar_grade, processar_bloco, contar_estados
+from comum import criar_grade, processar_bloco, contar_estados, ESPALHADOR
 
 from sequential.simulacao_sequencial import (
     proxima_geracao,
@@ -11,7 +12,7 @@ from sequential.simulacao_sequencial import (
 )
 
 
-def executar_distribuida(grade, quantidade_workers, geracoes, limiar):
+def executar_distribuida(grade, quantidade_workers, geracoes):
     total_linhas = len(grade)
 
     linhas_por_worker = total_linhas // quantidade_workers
@@ -39,19 +40,19 @@ def executar_distribuida(grade, quantidade_workers, geracoes, limiar):
 
             grade_com_halo = grade[inicio_halo:fim_halo]
 
+            # Removido o limiar estático, agora usa nossa nova lógica de probabilidades
             resultado = processar_bloco(
                 grade_com_halo,
                 inicio,
                 fim,
-                total_linhas,
-                limiar
+                total_linhas
             )
 
             nova_grade.extend(resultado)
 
         grade = nova_grade
 
-        if contar_estados(grade)[1] == 0:
+        if contar_estados(grade)[ESPALHADOR] == 0:
             break
 
     return grade
@@ -61,22 +62,19 @@ def executar_distribuida(grade, quantidade_workers, geracoes, limiar):
 LINHAS = 1000
 COLUNAS = 1000
 GERACOES = 50
-LIMIAR = 3
 WORKERS = 4
 SEMENTE = 123
 
-# Criação das matrizes iniciais
+# Criação das matrizes iniciais (agora usando as inovações embutidas)
 grade_sequencial = criar_grade_sequencial(
     LINHAS,
     COLUNAS,
-    percentual_espalhadores=0.05,
     semente=SEMENTE
 )
 
 grade_distribuida = criar_grade(
     LINHAS,
     COLUNAS,
-    percentual_espalhadores=0.05,
     semente=SEMENTE
 )
 
@@ -88,20 +86,21 @@ if grade_sequencial != grade_distribuida:
 print("Matrizes iniciais idênticas!")
 
 # Executa a simulação sequencial
+print("\nRodando simulação sequencial...")
+random.seed(SEMENTE) # <-- Sincroniza a roleta para a sequencial
 for _ in range(GERACOES):
-    grade_sequencial = proxima_geracao(
-        grade_sequencial, LIMIAR
-    )
+    grade_sequencial = proxima_geracao(grade_sequencial)
 
-    if contar_estados(grade_sequencial)[1] == 0:
+    if contar_estados(grade_sequencial)[ESPALHADOR] == 0:
         break
 
-# Executa a simulação distribuída por blocos
+# Executa a simulação distribuída por blocos simulados
+print("Rodando simulação distribuída...")
+random.seed(SEMENTE) # <-- Sincroniza a roleta com a mesma semente para a distribuída
 grade_distribuida = executar_distribuida(
     grade_distribuida,
     WORKERS,
-    GERACOES,
-    LIMIAR
+    GERACOES
 )
 
 # Compara os resultados finais
