@@ -17,7 +17,7 @@ INATIVO = 2
 
 
 # Cria a matriz inicial da população com a porcentagem inicial de espalhadores
-def criar_grade(linhas, colunas, percentual_espalhadores=0.02, semente=42):
+def criar_grade(linhas, colunas, percentual_espalhadores=0.05, semente=123):
 
     random.seed(semente)
     grade = [[IGNORANTE for _ in range(colunas)] for _ in range(linhas)]
@@ -136,4 +136,10 @@ def executar_simulacao(
 
 
 if __name__ == "__main__":
-    executar_simulacao(linhas=500, colunas=500, geracoes=50)
+    executar_simulacao(
+        linhas=1000,
+        colunas=1000,
+        geracoes=50,
+        percentual_espalhadores=0.05,
+        limiar_convencimento=3
+    )

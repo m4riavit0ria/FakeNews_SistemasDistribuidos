@@ -68,18 +68,26 @@ python parallel/main.py --size 500 --generations 100 --workers 4
 ```
 
 ### 3. Versão Distribuída (Sockets)
-Para rodar a versão distribuída em nós de rede local:
 
-* **No Servidor / Nó Mestre:**
-  ```bash
-  python distributed/master.py --port 5000 --nodes 2 --size 1000 --generations 100
-  ```
-* **Nos Nós Trabalhadores (Workers):**
-  ```bash
-  python distributed/worker.py --master-ip <IP_DO_MAESTRO> --port 5000
-  ```
+Para executar a versão distribuída, abra terminais separados para o servidor e os workers.
 
----
+**No Servidor / Nó Mestre:**
+
+    python distributed/servidor.py
+
+**Nos Nós Trabalhadores (Workers):**
+
+    python distributed/worker.py
+
+**Configurações atuais:**
+- Porta: 5000
+- Quantidade de workers: 4
+- Tamanho da matriz: 1000 × 1000
+- Máximo de gerações: 50
+
+A configuração dos parâmetros é realizada diretamente no arquivo `servidor.py`.
+
+**Observação:** atualmente, a execução utiliza `127.0.0.1`, permitindo testes na mesma máquina. Para executar em computadores diferentes na rede local, será necessário configurar o IP do servidor no arquivo `worker.py`.
 
 ## Automação de Experimentos e Métricas
 
