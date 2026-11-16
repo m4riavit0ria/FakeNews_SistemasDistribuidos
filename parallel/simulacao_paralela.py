@@ -17,7 +17,7 @@ INATIVO = 2
 BOT = 3
 
 # Cria a matriz inicial com proporções de diferentes agentes
-def criar_grade(linhas, colunas, perc_espalhadores=0.03, perc_bots=0.01, perc_checkers=0.02, semente=42):
+def criar_grade(linhas, colunas, perc_espalhadores=0.03, perc_bots=0.01, perc_checkers=0.02, semente=123):
     random.seed(semente)
     grade = [[IGNORANTE for _ in range(colunas)] for _ in range(linhas)]
     total_celulas = linhas * colunas
