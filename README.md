@@ -15,7 +15,7 @@ O sistema simula uma rede de indivíduos dispostos em uma matriz bidimensional o
 * **Fact-Checker (`-1`):** Agente verificador imune que reduz em **70%** a probabilidade de contágio ao seu redor ($\text{chance} \times 0,3$).
 
 ### Regras de Evolução por Geração
-1. **Contágio (`Ignorante -> Espalhador`):** Se houver ao menos um vizinho espalhador (peso $+1$) ou bot (peso $+2$), a probabilidade base de convencimento é $P = 0,20 + 0,15 \times \text{peso\_infecção}$ (atenuada para $0,3 \times P$ na presença de um *Fact-Checker*).
+1. **Contágio (`Ignorante -> Espalhador`):** Se houver ao menos um vizinho espalhador (peso `+1`) ou bot (peso `+2`), a probabilidade base de convencimento é `P = 0,20 + 0,15 × peso_infeccao` (atenuada para `0,3 × P` na presença de um *Fact-Checker*).
 2. **Maturação (`Espalhador -> Inativo`):** A cada geração, um espalhador comum tem **35%** de chance de cessar o compartilhamento.
 3. **Recaída (`Inativo -> Ignorante`):** A cada geração, um indivíduo inativo tem **5%** de chance de esquecer a checagem e tornar-se suscetível novamente.
 4. **Reprodutibilidade:** Todas as execuções utilizam semente fixa (`semente = 123`) para garantir que as três implementações partam exatamente da mesma matriz inicial e preservem o comportamento lógico.
