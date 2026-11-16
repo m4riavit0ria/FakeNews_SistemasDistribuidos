@@ -1,0 +1,7 @@
+{
+  "processador": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+  "nucleos_logicos": 8,
+  "ram_gb": "N/A (instale psutil)",
+  "sistema_operacional": "Windows 11 (10.0.26300)",
+  "versao_python": "3.13.17"
+}
