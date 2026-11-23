@@ -41,7 +41,7 @@ FakeNews_SistemasDistribuidos/
 │   └── analisar_resultados.py        # Análise estatística (pandas) e gráficos (matplotlib)
 ├── resultados/
 │   ├── ambiente_experimental.json    # Metadados de hardware e SO coletados
-│   ├── experimentos.csv              # Dados brutos das 78 execuções experimentais
+│   ├── experimentos.csv              # Dados brutos das 114 execuções experimentais
 │   ├── resumo_metricas.csv           # Médias e desvios padrão agrupados por cenário
 │   └── graficos/                     # Gráficos PNG gerados para o relatório
 ├── requirements.txt                  # Dependências Python para análise e gráficos
@@ -113,19 +113,19 @@ python experimentos/analisar_resultados.py
 
 | Dimensão ($N \times N$) | Sequencial (s) | Paralela — 4 proc. (s) | Distribuída — 4 workers (s) | Speedup Paralela | Speedup Distribuída |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **100 × 100** | 0,3507 | 0,3946 | 0,2255 | 0,89× | 1,56× |
-| **500 × 500** | 8,3955 | 4,2577 | 4,4038 | 1,97× | 1,91× |
-| **1000 × 1000** | 33,2224 | 15,6057 | 16,4222 | 2,13× | 2,02× |
-| **2000 × 2000** | 149,5590 | 74,3004 | 91,9155 | 2,01× | 1,63× |
+| **100 × 100** | 0,3507 | 0,4340 | 0,2255 | 0,81× | 1,56× |
+| **500 × 500** | 8,3955 | 4,6087 | 4,4038 | 1,82× | 1,91× |
+| **1000 × 1000** | 33,2224 | 13,4875 | 16,4222 | 2,46× | 2,02× |
+| **2000 × 2000** | 149,5590 | 52,9883 | 91,9155 | 2,82× | 1,63× |
 
 ### 6.2. Escalabilidade por Processos na Versão Paralela (Matriz 500×500, 50 gerações)
 
 | Processos ($N$) | Tempo Médio (s) | Speedup | Eficiência (%) |
 | :---: | :---: | :---: | :---: |
-| **1** | 9,0619 | 1,00× | 100,00% |
-| **2** | 5,3605 | 1,69× | 84,52% |
-| **4** | 4,1987 | 2,16× | 53,96% |
-| **8** | 4,2700 | 2,12× | 26,53% |
+| **1** | 9,1745 | 1,00× | 100,00% |
+| **2** | 5,2576 | 1,75× | 87,25% |
+| **4** | 3,7760 | 2,43× | 60,74% |
+| **8** | 3,0129 | 3,05× | 38,06% |
 
 ### 6.3. Escalabilidade por Workers na Versão Distribuída (Matriz 500×500, 50 gerações)
 
@@ -137,9 +137,9 @@ python experimentos/analisar_resultados.py
 | **4** | 4,4125 | 2,53× | 63,14% |
 
 ### 6.4. Principais Gargalos Identificados
-1. **Matrizes pequenas em paralelo (`100 × 100`):** A versão paralela ($0,3946\text{ s}$) foi mais lenta que a sequencial ($0,3507\text{ s}$) porque o custo de criação dos processos (`spawn` no Windows) e serialização da grade supera o tempo de cálculo de apenas 10.000 células.
-2. **Saturação acima de 4 processos:** Como o processador possui **4 núcleos físicos**, escalar de 4 para 8 processos não trouxe ganho de tempo ($4,20\text{ s} \to 4,27\text{ s}$) e reduziu a eficiência de $53,96\%$ para $26,53\%$ devido à contenção de CPU e cópia de memória entre processos.
-3. **Custo de comunicação na versão distribuída:** Em matrizes grandes ($2000 \times 2000$), a versão distribuída ($91,92\text{ s}$) fica atrás da paralela ($74,30\text{ s}$) devido à serialização JSON e à transferência síncrona das fatias e bordas (*halos*) via Sockets TCP a cada geração.
+1. **Matrizes pequenas em paralelo (100 × 100):** A versão paralela ($0,4340\text{ s}$) foi mais lenta que a sequencial ($0,3507\text{ s}$) porque o custo de criação dos processos (spawn no Windows) e transferência das fatias supera o tempo de cálculo de apenas 10.000 células.
+2. **Queda de eficiência acima de 4 processos:** Como o processador possui 4 núcleos físicos, escalar de 4 para 8 processos reduz a eficiência de $60,74\%$ para $38,06\%$ devido ao compartilhamento de recursos entre threads lógicas (SMT) e ao overhead de sincronização entre gerações.
+3. **Custo de comunicação na versão distribuída:** Em matrizes grandes ($2000 \times 2000$), a versão distribuída ($91,92\text{ s}$) fica atrás da paralela ($52,99\text{ s}$) devido à serialização JSON, à contenção dos 4 workers na mesma CPU e à transferência síncrona das fatias e bordas (halos) via Sockets TCP a cada geração.
 
 ---
 
@@ -156,3 +156,5 @@ Compress-Archive -Path sequential, parallel, distributed, experimentos, resultad
 ## 8. Referências
 * DALEY, D. J.; KENDALL, D. G. *Epidemics and Rumours*. Nature, v. 204, p. 1118, 1964.
 * Documentação oficial do Python 3.13 — módulos `multiprocessing` e `socket`.
+* FERRARA, E. et al. The rise of social bots. Communications of the ACM, v. 59, n. 7, p. 96–104, 2016.
+

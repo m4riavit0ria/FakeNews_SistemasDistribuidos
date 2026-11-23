@@ -170,8 +170,8 @@ def rodar_sequencial(tam_matriz, geracoes, pct_espalhadores):
 # 3. EXECUÇÃO PARALELA (MULTIPROCESSING)
 # ==============================================================================
 def _worker_pool(args):
-    grade, inicio, fim, total_linhas, seed_bloco = args
-    return processar_bloco(grade, inicio, fim, total_linhas, seed_bloco=seed_bloco)
+    grade_com_halo, inicio, fim, total_linhas, seed_bloco = args
+    return processar_bloco(grade_com_halo, inicio, fim, total_linhas, seed_bloco=seed_bloco)
 
 
 def rodar_paralela(tam_matriz, geracoes, pct_espalhadores, n_processos):
@@ -182,7 +182,13 @@ def rodar_paralela(tam_matriz, geracoes, pct_espalhadores, n_processos):
     with multiprocessing.Pool(processes=n_processos) as pool:
         for g in range(geracoes):
             tarefas = [
-                (grade, ini, fim, tam_matriz, SEMENTE_PADRAO + g * 100 + idx)
+                (
+                    grade[max(0, ini - 1) : min(tam_matriz, fim + 1)],
+                    ini,
+                    fim,
+                    tam_matriz,
+                    SEMENTE_PADRAO + g * 100 + idx,
+                )
                 for idx, (ini, fim) in enumerate(blocos)
             ]
             fatias = pool.map(_worker_pool, tarefas)
@@ -417,11 +423,3 @@ def main():
                 f.flush()
 
     print(f"\nConcluído! Resultados salvos em '{arquivo_saida}'.")
-
-
-if __name__ == "__main__":
-    multiprocessing.freeze_support()
-    if len(sys.argv) >= 3 and sys.argv[1] == "--worker":
-        _modo_worker_tcp(int(sys.argv[2]))
-    else:
-        main()
